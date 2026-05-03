@@ -90,12 +90,14 @@ export function CreateRoomForm({ players }: { players: Player[] }) {
         <Label>팀 선정 방식</Label>
         <div className="grid grid-cols-3 gap-2">
           {(Object.entries(TEAM_METHODS) as [TeamMethod, typeof TEAM_METHODS[TeamMethod]][]).map(([key, m]) => (
-            <button
+            <div
               key={key}
-              type="button"
+              role="button"
+              tabIndex={0}
               onClick={() => setTeamMethod(key)}
+              onKeyDown={(e) => e.key === 'Enter' && setTeamMethod(key)}
               className={cn(
-                'flex flex-col gap-0.5 px-3 py-2.5 rounded-lg border text-left transition-colors',
+                'flex flex-col gap-0.5 px-3 py-2.5 rounded-lg border text-left transition-colors cursor-pointer',
                 teamMethod === key
                   ? 'border-yellow-400 bg-yellow-400/10'
                   : 'border-border hover:border-border/80'
@@ -106,7 +108,7 @@ export function CreateRoomForm({ players }: { players: Player[] }) {
                 <InfoTooltip>{m.tooltip}</InfoTooltip>
               </span>
               <span className="text-xs text-muted-foreground">{m.description}</span>
-            </button>
+            </div>
           ))}
         </div>
       </div>
@@ -115,12 +117,14 @@ export function CreateRoomForm({ players }: { players: Player[] }) {
         <Label>점수 계산 방식</Label>
         <div className="grid grid-cols-2 gap-2">
           {(Object.values(SCORING_RULES) as typeof SCORING_RULES[ScoringRuleKey][]).map((rule) => (
-            <button
+            <div
               key={rule.key}
-              type="button"
+              role="button"
+              tabIndex={0}
               onClick={() => setScoringRule(rule.key)}
+              onKeyDown={(e) => e.key === 'Enter' && setScoringRule(rule.key)}
               className={cn(
-                'flex flex-col gap-0.5 px-3 py-2.5 rounded-lg border text-left transition-colors',
+                'flex flex-col gap-0.5 px-3 py-2.5 rounded-lg border text-left transition-colors cursor-pointer',
                 scoringRule === rule.key
                   ? 'border-yellow-400 bg-yellow-400/10'
                   : 'border-border hover:border-border/80'
@@ -131,7 +135,7 @@ export function CreateRoomForm({ players }: { players: Player[] }) {
                 <InfoTooltip>{rule.tooltip}</InfoTooltip>
               </span>
               <span className="text-xs text-muted-foreground">{rule.description}</span>
-            </button>
+            </div>
           ))}
         </div>
       </div>
