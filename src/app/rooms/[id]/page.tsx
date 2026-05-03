@@ -47,11 +47,13 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
         </p>
       </div>
 
-      <TeamView teams={teams} teamCount={typedRoom.team_count} />
+      <TeamView teams={teams} teamCount={typedRoom.team_count} roomId={typedRoom.id} />
 
       <ScoreBoard
         rounds={typedRoom.round_results}
         teamCount={typedRoom.team_count}
+        scoringRuleKey={typedRoom.scoring_rule ?? 'standard'}
+        roomId={typedRoom.id}
       />
 
       {typedRoom.status !== 'done' && nextRound <= 10 && (

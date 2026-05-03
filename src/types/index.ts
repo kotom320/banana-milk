@@ -26,6 +26,7 @@ export interface Room {
   title: string
   team_count: 2 | 3
   status: 'waiting' | 'in_progress' | 'done'
+  scoring_rule: 'standard' | 'kill_focused' | 'survival' | 'competitive'
   created_at: string
 }
 
@@ -41,6 +42,7 @@ export interface RoundResult {
   id: string
   room_id: string
   round_number: number
+  map_name: string
   team1_placement: number
   team1_kills: number
   team2_placement: number

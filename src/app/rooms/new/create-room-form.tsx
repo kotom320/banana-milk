@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { createRoom } from '@/app/actions/room'
+import { SCORING_RULES, ScoringRuleKey } from '@/lib/scoring-rules'
 
 const TIER_COLORS: Record<Tier, string> = {
   1: 'bg-yellow-400 text-black',
@@ -20,12 +21,10 @@ const TIER_COLORS: Record<Tier, string> = {
 
 export function CreateRoomForm({ players }: { players: Player[] }) {
   const router = useRouter()
-  const today = new Date().toLocaleDateString('ko-KR', {
-    month: 'long',
-    day: 'numeric',
-  })
+  const today = new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })
   const [title, setTitle] = useState(`${today} 내전`)
   const [teamCount, setTeamCount] = useState<2 | 3>(2)
+  const [scoringRule, setScoringRule] = useState<ScoringRuleKey>('standard')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
 
@@ -44,10 +43,9 @@ export function CreateRoomForm({ players }: { players: Player[] }) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!canCreate) return
-
     setLoading(true)
     try {
-      const room = await createRoom(title, teamCount, [...selectedIds])
+      const room = await createRoom(title, teamCount, [...selectedIds], scoringRule)
       toast.success('내전 방이 생성되었습니다!')
       router.push(`/rooms/${room.id}`)
     } catch (err) {
@@ -86,6 +84,28 @@ export function CreateRoomForm({ players }: { players: Player[] }) {
       </div>
 
       <div className="space-y-2">
+        <Label>점수 계산 방식</Label>
+        <div className="grid grid-cols-2 gap-2">
+          {(Object.values(SCORING_RULES) as typeof SCORING_RULES[ScoringRuleKey][]).map((rule) => (
+            <button
+              key={rule.key}
+              type="button"
+              onClick={() => setScoringRule(rule.key)}
+              className={cn(
+                'flex flex-col gap-0.5 px-3 py-2.5 rounded-lg border text-left transition-colors',
+                scoringRule === rule.key
+                  ? 'border-yellow-400 bg-yellow-400/10'
+                  : 'border-border hover:border-border/80'
+              )}
+            >
+              <span className="text-sm font-medium">{rule.name}</span>
+              <span className="text-xs text-muted-foreground">{rule.description}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-2">
         <Label>
           참가 인원 선택{' '}
           <span className="text-muted-foreground font-normal">
@@ -113,9 +133,7 @@ export function CreateRoomForm({ players }: { players: Player[] }) {
           ))}
         </div>
         {players.length === 0 && (
-          <p className="text-sm text-muted-foreground">
-            플레이어를 먼저 등록해주세요.
-          </p>
+          <p className="text-sm text-muted-foreground">플레이어를 먼저 등록해주세요.</p>
         )}
       </div>
 

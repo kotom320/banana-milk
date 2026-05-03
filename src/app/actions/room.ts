@@ -1,13 +1,14 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { getPlacementScore } from '@/lib/team-balancer'
 import { revalidatePath } from 'next/cache'
+import { ScoringRuleKey } from '@/lib/scoring-rules'
 
 export async function createRoom(
   title: string,
   teamCount: 2 | 3,
-  playerIds: string[]
+  playerIds: string[],
+  scoringRule: ScoringRuleKey = 'standard'
 ) {
   const supabase = await createClient()
 
@@ -27,7 +28,7 @@ export async function createRoom(
   // 2. room 생성
   const { data: room, error: rErr } = await supabase
     .from('rooms')
-    .insert({ title, team_count: teamCount })
+    .insert({ title, team_count: teamCount, scoring_rule: scoringRule })
     .select()
     .single()
 
@@ -53,23 +54,27 @@ export async function createRoom(
   return room
 }
 
+export interface RoundResultInput {
+  mapName: string
+  team1Placement: number
+  team1Kills: number
+  team2Placement: number
+  team2Kills: number
+  team3Placement?: number
+  team3Kills?: number
+}
+
 export async function submitRoundResult(
   roomId: string,
   roundNumber: number,
-  results: {
-    team1Placement: number
-    team1Kills: number
-    team2Placement: number
-    team2Kills: number
-    team3Placement?: number
-    team3Kills?: number
-  }
+  results: RoundResultInput
 ) {
   const supabase = await createClient()
 
   const { error } = await supabase.from('round_results').upsert({
     room_id: roomId,
     round_number: roundNumber,
+    map_name: results.mapName,
     team1_placement: results.team1Placement,
     team1_kills: results.team1Kills,
     team2_placement: results.team2Placement,
@@ -79,7 +84,30 @@ export async function submitRoundResult(
   })
 
   if (error) throw new Error(error.message)
+  revalidatePath(`/rooms/${roomId}`)
+}
 
+export async function movePlayerTeam(
+  roomPlayerId: string,
+  newTeam: 1 | 2 | 3,
+  roomId: string
+) {
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('room_players')
+    .update({ team_number: newTeam })
+    .eq('id', roomPlayerId)
+  if (error) throw new Error(error.message)
+  revalidatePath(`/rooms/${roomId}`)
+}
+
+export async function updateScoringRule(roomId: string, scoringRule: ScoringRuleKey) {
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('rooms')
+    .update({ scoring_rule: scoringRule })
+    .eq('id', roomId)
+  if (error) throw new Error(error.message)
   revalidatePath(`/rooms/${roomId}`)
 }
 
@@ -96,21 +124,3 @@ export async function updateRoomStatus(
   revalidatePath(`/rooms/${roomId}`)
 }
 
-// 누적 점수 계산 (기본 순위점수 + 킬점수, 티어 가중치 없음 - 팀 단위이므로)
-export function calcRoundScores(results: {
-  team1Placement: number
-  team1Kills: number
-  team2Placement: number
-  team2Kills: number
-  team3Placement?: number
-  team3Kills?: number
-}) {
-  return {
-    team1: getPlacementScore(results.team1Placement) + results.team1Kills,
-    team2: getPlacementScore(results.team2Placement) + results.team2Kills,
-    team3:
-      results.team3Placement !== undefined
-        ? getPlacementScore(results.team3Placement) + (results.team3Kills ?? 0)
-        : undefined,
-  }
-}
