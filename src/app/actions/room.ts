@@ -69,17 +69,20 @@ export async function submitRoundResult(
 ) {
   const supabase = await createClient()
 
-  const { error } = await supabase.from('round_results').upsert({
-    room_id: roomId,
-    round_number: roundNumber,
-    map_name: results.mapName,
-    team1_placement: results.team1Placement,
-    team1_kills: results.team1Kills,
-    team2_placement: results.team2Placement,
-    team2_kills: results.team2Kills,
-    team3_placement: results.team3Placement ?? null,
-    team3_kills: results.team3Kills ?? null,
-  })
+  const { error } = await supabase.from('round_results').upsert(
+    {
+      room_id: roomId,
+      round_number: roundNumber,
+      map_name: results.mapName,
+      team1_placement: results.team1Placement,
+      team1_kills: results.team1Kills,
+      team2_placement: results.team2Placement,
+      team2_kills: results.team2Kills,
+      team3_placement: results.team3Placement ?? null,
+      team3_kills: results.team3Kills ?? null,
+    },
+    { onConflict: 'room_id,round_number' }
+  )
 
   if (error) throw new Error(error.message)
   revalidatePath(`/rooms/${roomId}`)
