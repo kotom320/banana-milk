@@ -18,12 +18,14 @@ export function RoundInput({
 }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [formKey, setFormKey] = useState(0)
 
   async function handleSubmit(data: RoundResultInput) {
     setLoading(true)
     try {
       await submitRoundResult(roomId, roundNumber, data)
       toast.success(`${roundNumber}라운드 결과 기록 완료`)
+      setFormKey((k) => k + 1) // 폼 초기화
       router.refresh()
     } catch (err) {
       toast.error(err instanceof Error ? err.message : '저장 실패')
@@ -39,6 +41,7 @@ export function RoundInput({
       </CardHeader>
       <CardContent>
         <RoundForm
+          key={formKey}
           teamCount={teamCount}
           submitLabel={`${roundNumber}라운드 기록`}
           loading={loading}
