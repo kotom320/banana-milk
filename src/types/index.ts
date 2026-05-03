@@ -17,11 +17,12 @@ export interface Player {
   avg_kills: number
   avg_survival_time: number // 초 단위
   matches_analyzed: number
+  custom_score: number | null
   last_updated_at: string
   created_at: string
 }
 
-export type TeamMethod = 'balanced' | 'random' | 'tier_shuffle'
+export type TeamMethod = 'balanced' | 'random' | 'tier_shuffle' | 'custom_score'
 
 export interface Room {
   id: string

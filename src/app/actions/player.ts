@@ -69,3 +69,13 @@ export async function deletePlayer(playerId: string) {
   if (error) throw new Error(error.message)
   revalidatePath('/players')
 }
+
+export async function updateCustomScore(playerId: string, score: number | null) {
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('players')
+    .update({ custom_score: score })
+    .eq('id', playerId)
+  if (error) throw new Error(error.message)
+  revalidatePath('/players')
+}

@@ -30,6 +30,11 @@ export const TEAM_METHODS: Record<TeamMethod, { name: string; description: strin
     description: '순서 무작위 배정',
     tooltip: '모든 플레이어를 무작위로 섞어 팀에 배정\n\n티어 무관 완전 랜덤.\n운빨 내전을 원할 때 사용',
   },
+  custom_score: {
+    name: '커스텀 점수',
+    description: '개인 점수 기반 Snake Draft',
+    tooltip: '플레이어 관리에서 직접 입력한 커스텀 점수 기반 배분\n\nPUBG 전적 티어와 무관하게 우리만의 기준으로 점수를 부여하고 팀을 나눕니다.\n\n커스텀 점수 미입력 시 티어 점수로 대체',
+  },
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -53,13 +58,17 @@ function snakeDraft(players: Player[], teamCount: 2 | 3): Player[][] {
 }
 
 function toAssignment(teams: Player[][]): TeamAssignment {
-  const scores = teams.map((t) => t.reduce((sum, p) => sum + TIER_SCORE[p.tier], 0))
+  const scores = teams.map((t) => t.reduce((sum, p) => sum + getEffectiveScore(p), 0))
   return {
     team1: teams[0] ?? [],
     team2: teams[1] ?? [],
     team3: teams[2],
     scoreDiff: Math.max(...scores) - Math.min(...scores),
   }
+}
+
+export function getEffectiveScore(player: Player): number {
+  return player.custom_score ?? TIER_SCORE[player.tier]
 }
 
 export function assignTeams(
@@ -75,13 +84,18 @@ export function assignTeams(
   }
 
   if (method === 'tier_shuffle') {
-    // 티어별로 그룹화 후 각 그룹 내 셔플, 그 다음 Snake Draft
     const byTier: Record<number, Player[]> = {}
     players.forEach((p) => {
       if (!byTier[p.tier]) byTier[p.tier] = []
       byTier[p.tier].push(p)
     })
     const sorted = [1, 2, 3, 4].flatMap((tier) => shuffle(byTier[tier] ?? []))
+    return toAssignment(snakeDraft(sorted, teamCount))
+  }
+
+  if (method === 'custom_score') {
+    // 커스텀 점수 기반 정렬 (없으면 티어 점수 대체)
+    const sorted = [...players].sort((a, b) => getEffectiveScore(b) - getEffectiveScore(a))
     return toAssignment(snakeDraft(sorted, teamCount))
   }
 

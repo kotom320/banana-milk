@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { Player, Tier } from '@/types'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -13,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { refreshPlayer, deletePlayer } from '@/app/actions/player'
+import { refreshPlayer, deletePlayer, updateCustomScore } from '@/app/actions/player'
 import { InfoTooltip } from '@/components/info-tooltip'
 
 const TIER_COLORS: Record<Tier, string> = {
@@ -45,6 +46,66 @@ function formatDate(iso: string) {
     minute: '2-digit',
     hour12: false,
   })
+}
+
+function CustomScoreCell({ player }: { player: Player }) {
+  const [editing, setEditing] = useState(false)
+  const [value, setValue] = useState(player.custom_score?.toString() ?? '')
+  const [saving, setSaving] = useState(false)
+
+  async function handleSave() {
+    const score = value === '' ? null : Number(value)
+    if (score !== null && (isNaN(score) || score < 1 || score > 99)) {
+      toast.error('1~99 사이 숫자를 입력해주세요')
+      return
+    }
+    setSaving(true)
+    try {
+      await updateCustomScore(player.id, score)
+      toast.success('커스텀 점수 저장 완료')
+      setEditing(false)
+    } catch {
+      toast.error('저장 실패')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1">
+        <Input
+          type="number"
+          min={1}
+          max={99}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          className="h-6 w-14 text-xs px-1"
+          autoFocus
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleSave()
+            if (e.key === 'Escape') setEditing(false)
+          }}
+        />
+        <Button size="sm" className="h-6 px-2 text-xs bg-yellow-400 text-black hover:bg-yellow-300" disabled={saving} onClick={handleSave}>
+          저장
+        </Button>
+        <Button size="sm" variant="ghost" className="h-6 px-1 text-xs" onClick={() => setEditing(false)}>
+          취소
+        </Button>
+      </div>
+    )
+  }
+
+  return (
+    <button
+      className="text-sm tabular-nums hover:text-yellow-400 transition-colors"
+      onClick={() => setEditing(true)}
+      title="클릭해서 편집"
+    >
+      {player.custom_score ?? <span className="text-muted-foreground text-xs">—</span>}
+    </button>
+  )
 }
 
 export function PlayerTable({ players }: { players: Player[] }) {
@@ -95,6 +156,14 @@ export function PlayerTable({ players }: { players: Player[] }) {
           </TableHead>
           <TableHead>
             <span className="flex items-center gap-1">
+              커스텀 점수
+              <InfoTooltip>
+                {`우리만의 기준으로 직접 부여하는 점수 (1~99)\n\n클릭하면 편집 가능\n팀 선정 방식을 "커스텀 점수"로 선택하면\n이 점수 기반으로 팀이 배분됩니다`}
+              </InfoTooltip>
+            </span>
+          </TableHead>
+          <TableHead>
+            <span className="flex items-center gap-1">
               스타일
               <InfoTooltip>
                 {`최근 전적 분석 기반 플레이 성향\n\n공격형 캐리: 딜량 400↑, 킬 2.5↑\n단기결전형: 분당딜량 높고 생존시간 짧음\n치킨런너: 생존시간 25분↑, 딜량 낮음\n올라운더: 균형잡힌 스탯\n서포터형: 딜량 150 미만`}
@@ -120,6 +189,9 @@ export function PlayerTable({ players }: { players: Player[] }) {
                   {`산정 점수: ${Math.round(p.avg_damage * 0.7 + p.avg_kills * 80 * 0.3)}점\n딜 기여: ${Math.round(p.avg_damage * 0.7)}점\n킬 기여: ${Math.round(p.avg_kills * 80 * 0.3)}점`}
                 </InfoTooltip>
               </span>
+            </TableCell>
+            <TableCell>
+              <CustomScoreCell player={p} />
             </TableCell>
             <TableCell className="text-sm text-muted-foreground">{p.playstyle}</TableCell>
             <TableCell className="text-right">{p.avg_damage}</TableCell>
