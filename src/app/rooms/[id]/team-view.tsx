@@ -29,10 +29,12 @@ export function TeamView({
   teams: initialTeams,
   teamCount,
   roomId,
+  isDone = false,
 }: {
   teams: Record<number, RoomPlayerWithPlayer[]>
   teamCount: 2 | 3
   roomId: string
+  isDone?: boolean
 }) {
   const router = useRouter()
   const [teams, setTeams] = useState(initialTeams)
@@ -85,18 +87,20 @@ export function TeamView({
                     {rp.player.tier}T
                   </Badge>
                   <span className="flex-1 truncate">{rp.player.pubg_nickname}</span>
-                  <select
-                    disabled={pending}
-                    value={rp.team_number}
-                    onChange={(e) => handleMove(rp, Number(e.target.value) as 1 | 2 | 3)}
-                    className="text-xs bg-background border border-border rounded px-1 py-0.5 text-muted-foreground hover:border-foreground/40 transition-colors cursor-pointer disabled:opacity-50"
-                  >
-                    {Array.from({ length: teamCount }, (_, i) => i + 1).map((t) => (
-                      <option key={t} value={t}>
-                        {TEAM_LABELS[t - 1]}
-                      </option>
-                    ))}
-                  </select>
+                  {!isDone && (
+                    <select
+                      disabled={pending}
+                      value={rp.team_number}
+                      onChange={(e) => handleMove(rp, Number(e.target.value) as 1 | 2 | 3)}
+                      className="text-xs bg-background border border-border rounded px-1 py-0.5 text-muted-foreground hover:border-foreground/40 transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                      {Array.from({ length: teamCount }, (_, i) => i + 1).map((t) => (
+                        <option key={t} value={t}>
+                          {TEAM_LABELS[t - 1]}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               ))}
               {members.length === 0 && (

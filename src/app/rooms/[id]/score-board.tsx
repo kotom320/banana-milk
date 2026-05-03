@@ -33,11 +33,13 @@ export function ScoreBoard({
   teamCount,
   scoringRuleKey,
   roomId,
+  isDone = false,
 }: {
   rounds: RoundResult[]
   teamCount: 2 | 3
   scoringRuleKey: ScoringRuleKey
   roomId: string
+  isDone?: boolean
 }) {
   const router = useRouter()
   const [currentRuleKey, setCurrentRuleKey] = useState<ScoringRuleKey>(scoringRuleKey)
@@ -76,7 +78,7 @@ export function ScoreBoard({
     }
   }
 
-  const RuleSelector = () => (
+  const RuleSelector = () => isDone ? null : (
     <div className="flex flex-wrap gap-1.5 mt-2">
       {(Object.values(SCORING_RULES) as typeof SCORING_RULES[ScoringRuleKey][]).map((r) => (
         <span key={r.key} className="inline-flex items-center gap-1">
@@ -169,16 +171,19 @@ export function ScoreBoard({
                       {s ?? '-'}
                     </TableCell>
                   ))}
-                  <TableCell className="text-right">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-xs text-muted-foreground h-6 px-2"
-                      onClick={() => setEditingRound(round)}
-                    >
-                      수정
-                    </Button>
-                  </TableCell>
+                  {!isDone && (
+                    <TableCell className="text-right">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-xs text-muted-foreground h-6 px-2"
+                        onClick={() => setEditingRound(round)}
+                      >
+                        수정
+                      </Button>
+                    </TableCell>
+                  )}
+                  {isDone && <TableCell />}
                 </TableRow>
               ))}
               <TableRow className="font-bold border-t-2">
