@@ -21,12 +21,16 @@ export interface Player {
   created_at: string
 }
 
+export type TeamMethod = 'balanced' | 'random' | 'tier_shuffle'
+
 export interface Room {
   id: string
   title: string
   team_count: 2 | 3
   status: 'waiting' | 'in_progress' | 'done'
   scoring_rule: 'standard' | 'kill_focused' | 'survival' | 'competitive'
+  team_method: TeamMethod
+  winner_team: 1 | 2 | 3 | null
   created_at: string
 }
 

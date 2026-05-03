@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Player, Tier } from '@/types'
+import { Player, TeamMethod, Tier } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { createRoom } from '@/app/actions/room'
 import { SCORING_RULES, ScoringRuleKey } from '@/lib/scoring-rules'
+import { TEAM_METHODS } from '@/lib/team-balancer'
 import { InfoTooltip } from '@/components/info-tooltip'
 
 const TIER_COLORS: Record<Tier, string> = {
@@ -26,6 +27,7 @@ export function CreateRoomForm({ players }: { players: Player[] }) {
   const [title, setTitle] = useState(`${today} 내전`)
   const [teamCount, setTeamCount] = useState<2 | 3>(2)
   const [scoringRule, setScoringRule] = useState<ScoringRuleKey>('standard')
+  const [teamMethod, setTeamMethod] = useState<TeamMethod>('balanced')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
 
@@ -46,7 +48,7 @@ export function CreateRoomForm({ players }: { players: Player[] }) {
     if (!canCreate) return
     setLoading(true)
     try {
-      const room = await createRoom(title, teamCount, [...selectedIds], scoringRule)
+      const room = await createRoom(title, teamCount, [...selectedIds], scoringRule, teamMethod)
       toast.success('내전 방이 생성되었습니다!')
       router.push(`/rooms/${room.id}`)
     } catch (err) {
@@ -80,6 +82,31 @@ export function CreateRoomForm({ players }: { players: Player[] }) {
             >
               {n}팀
             </Button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>팀 선정 방식</Label>
+        <div className="grid grid-cols-3 gap-2">
+          {(Object.entries(TEAM_METHODS) as [TeamMethod, typeof TEAM_METHODS[TeamMethod]][]).map(([key, m]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setTeamMethod(key)}
+              className={cn(
+                'flex flex-col gap-0.5 px-3 py-2.5 rounded-lg border text-left transition-colors',
+                teamMethod === key
+                  ? 'border-yellow-400 bg-yellow-400/10'
+                  : 'border-border hover:border-border/80'
+              )}
+            >
+              <span className="flex items-center gap-1 text-sm font-medium">
+                {m.name}
+                <InfoTooltip>{m.tooltip}</InfoTooltip>
+              </span>
+              <span className="text-xs text-muted-foreground">{m.description}</span>
+            </button>
           ))}
         </div>
       </div>

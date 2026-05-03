@@ -8,6 +8,7 @@ const links = [
   { href: '/', label: '홈' },
   { href: '/players', label: '플레이어 관리' },
   { href: '/rooms', label: '내전 방' },
+  { href: '/stats', label: '통계' },
 ]
 
 export function NavBar() {
