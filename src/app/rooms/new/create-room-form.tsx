@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { createRoom } from '@/app/actions/room'
 import { SCORING_RULES, ScoringRuleKey } from '@/lib/scoring-rules'
+import { InfoTooltip } from '@/components/info-tooltip'
 
 const TIER_COLORS: Record<Tier, string> = {
   1: 'bg-yellow-400 text-black',
@@ -98,7 +99,10 @@ export function CreateRoomForm({ players }: { players: Player[] }) {
                   : 'border-border hover:border-border/80'
               )}
             >
-              <span className="text-sm font-medium">{rule.name}</span>
+              <span className="flex items-center gap-1 text-sm font-medium">
+                {rule.name}
+                <InfoTooltip>{rule.tooltip}</InfoTooltip>
+              </span>
               <span className="text-xs text-muted-foreground">{rule.description}</span>
             </button>
           ))}

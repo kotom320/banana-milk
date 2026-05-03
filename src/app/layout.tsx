@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { NavBar } from "@/components/nav-bar";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const geist = Geist({ subsets: ["latin"] });
 
@@ -19,9 +20,11 @@ export default function RootLayout({
   return (
     <html lang="ko" className="dark">
       <body className={`${geist.className} min-h-screen bg-background text-foreground`}>
-        <NavBar />
-        <main className="container mx-auto px-4 py-8 max-w-5xl">{children}</main>
-        <Toaster richColors position="top-right" />
+        <TooltipProvider delay={200}>
+          <NavBar />
+          <main className="container mx-auto px-4 py-8 max-w-5xl">{children}</main>
+          <Toaster richColors position="top-right" />
+        </TooltipProvider>
       </body>
     </html>
   );

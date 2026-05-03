@@ -24,6 +24,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { RoundForm } from './round-form'
+import { InfoTooltip } from '@/components/info-tooltip'
 
 const TEAM_LABELS = ['Team A', 'Team B', 'Team C']
 
@@ -78,18 +79,20 @@ export function ScoreBoard({
   const RuleSelector = () => (
     <div className="flex flex-wrap gap-1.5 mt-2">
       {(Object.values(SCORING_RULES) as typeof SCORING_RULES[ScoringRuleKey][]).map((r) => (
-        <button
-          key={r.key}
-          disabled={ruleChanging}
-          onClick={() => handleRuleChange(r.key)}
-          className={`px-2 py-0.5 rounded text-xs border transition-colors disabled:opacity-50 ${
-            currentRuleKey === r.key
-              ? 'border-yellow-400 bg-yellow-400/10 text-yellow-400'
-              : 'border-border text-muted-foreground hover:border-foreground/40'
-          }`}
-        >
-          {r.name}
-        </button>
+        <span key={r.key} className="inline-flex items-center gap-1">
+          <button
+            disabled={ruleChanging}
+            onClick={() => handleRuleChange(r.key)}
+            className={`px-2 py-0.5 rounded text-xs border transition-colors disabled:opacity-50 ${
+              currentRuleKey === r.key
+                ? 'border-yellow-400 bg-yellow-400/10 text-yellow-400'
+                : 'border-border text-muted-foreground hover:border-foreground/40'
+            }`}
+          >
+            {r.name}
+          </button>
+          <InfoTooltip>{r.tooltip}</InfoTooltip>
+        </span>
       ))}
     </div>
   )
