@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { RoomWithPlayers } from '@/types'
-import { SCORING_RULES, calcTeamScore } from '@/lib/scoring-rules'
+import { SCORING_RULES, ScoringRuleKey, dbRowToScoringRule, calcTeamScore } from '@/lib/scoring-rules'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
@@ -16,15 +16,23 @@ const TIER_COLORS: Record<number, string> = {
 export default async function StatsPage() {
   const supabase = await createClient()
 
-  const { data: rooms } = await supabase
-    .from('rooms')
-    .select(`
-      *,
-      room_players ( *, player: players (*) ),
-      round_results (*)
-    `)
-    .eq('status', 'done')
-    .order('created_at', { ascending: false })
+  const [{ data: rooms }, { data: ruleRows }] = await Promise.all([
+    supabase
+      .from('rooms')
+      .select(`
+        *,
+        room_players ( *, player: players (*) ),
+        round_results (*)
+      `)
+      .eq('status', 'done')
+      .order('created_at', { ascending: false }),
+    supabase.from('scoring_rule_configs').select('*'),
+  ])
+
+  const allRules = { ...SCORING_RULES }
+  for (const row of ruleRows ?? []) {
+    allRules[row.key as ScoringRuleKey] = dbRowToScoringRule(row)
+  }
 
   if (!rooms || rooms.length === 0) {
     return (
@@ -52,11 +60,11 @@ export default async function StatsPage() {
   for (const room of rooms as unknown as RoomWithPlayers[]) {
     if (!room.winner_team) continue
 
-    const rule = SCORING_RULES[room.scoring_rule ?? 'standard']
+    const rule = allRules[room.scoring_rule ?? 'standard']
     const totals = [0, 0, 0]
     for (const r of room.round_results) {
-      totals[0] += calcTeamScore(rule, r.team1_placement, r.team1_kills)
-      totals[1] += calcTeamScore(rule, r.team2_placement, r.team2_kills)
+      if (r.team1_placement != null) totals[0] += calcTeamScore(rule, r.team1_placement, r.team1_kills ?? 0)
+      if (r.team2_placement != null) totals[1] += calcTeamScore(rule, r.team2_placement, r.team2_kills ?? 0)
       if (room.team_count === 3 && r.team3_placement != null) {
         totals[2] += calcTeamScore(rule, r.team3_placement, r.team3_kills ?? 0)
       }

@@ -44,6 +44,24 @@ export const SCORING_RULES: Record<ScoringRuleKey, ScoringRule> = {
   },
 }
 
+export function dbRowToScoringRule(row: {
+  key: string
+  name: string
+  description: string
+  tooltip: string
+  placements: number[]
+  kill_point: number | string
+}): ScoringRule {
+  return {
+    key: row.key as ScoringRuleKey,
+    name: row.name,
+    description: row.description,
+    tooltip: row.tooltip,
+    placements: row.placements,
+    killPoint: Number(row.kill_point),
+  }
+}
+
 export function getPlacementScoreByRule(rule: ScoringRule, place: number): number {
   if (place <= 0) return 0
   return rule.placements[place - 1] ?? 0

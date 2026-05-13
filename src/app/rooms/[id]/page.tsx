@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { RoomWithPlayers } from '@/types'
-import { SCORING_RULES } from '@/lib/scoring-rules'
+import { SCORING_RULES, ScoringRuleKey, dbRowToScoringRule } from '@/lib/scoring-rules'
 import { calcTeamScore } from '@/lib/scoring-rules'
 import { TeamView } from './team-view'
 import { ScoreBoard } from './score-board'
@@ -15,7 +15,8 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
   const { id } = await params
   const supabase = await createClient()
 
-  const { data: room } = await supabase
+  const [{ data: room }, { data: ruleRows }] = await Promise.all([
+    supabase
     .from('rooms')
     .select(`
       *,
@@ -27,9 +28,16 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
     `)
     .eq('id', id)
     .order('round_number', { referencedTable: 'round_results', ascending: true })
-    .single()
+    .single(),
+    supabase.from('scoring_rule_configs').select('*'),
+  ])
 
   if (!room) notFound()
+
+  const allRules = { ...SCORING_RULES }
+  for (const row of ruleRows ?? []) {
+    allRules[row.key as ScoringRuleKey] = dbRowToScoringRule(row)
+  }
 
   const typedRoom = room as unknown as RoomWithPlayers
 
@@ -39,17 +47,29 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
     teams[rp.team_number].push(rp)
   }
 
-  const rule = SCORING_RULES[typedRoom.scoring_rule ?? 'standard']
+  const rule = allRules[typedRoom.scoring_rule ?? 'standard']
+
+  function isRoundComplete(r: (typeof typedRoom.round_results)[0]) {
+    return (
+      r.team1_placement != null &&
+      r.team2_placement != null &&
+      (typedRoom.team_count !== 3 || r.team3_placement != null)
+    )
+  }
+
+  const completeRounds = typedRoom.round_results.filter(isRoundComplete)
+  const activeRound = typedRoom.round_results.find((r) => !isRoundComplete(r))
+
   const totals = [0, 0, 0]
-  for (const r of typedRoom.round_results) {
-    totals[0] += calcTeamScore(rule, r.team1_placement, r.team1_kills)
-    totals[1] += calcTeamScore(rule, r.team2_placement, r.team2_kills)
+  for (const r of completeRounds) {
+    totals[0] += calcTeamScore(rule, r.team1_placement!, r.team1_kills ?? 0)
+    totals[1] += calcTeamScore(rule, r.team2_placement!, r.team2_kills ?? 0)
     if (typedRoom.team_count === 3 && r.team3_placement != null) {
       totals[2] += calcTeamScore(rule, r.team3_placement, r.team3_kills ?? 0)
     }
   }
 
-  const nextRound = typedRoom.round_results.length + 1
+  const nextRound = activeRound?.round_number ?? (completeRounds.length + 1)
   const isDone = typedRoom.status === 'done'
 
   return (
@@ -62,7 +82,7 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
             {typedRoom.round_results.length > 0 && ` · ${typedRoom.round_results.length}라운드 완료`}
           </p>
         </div>
-        {!isDone && typedRoom.round_results.length > 0 && (
+        {!isDone && completeRounds.length > 0 && (
           <FinishRoom
             roomId={typedRoom.id}
             teamCount={typedRoom.team_count}
@@ -84,6 +104,7 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
         rounds={typedRoom.round_results}
         teamCount={typedRoom.team_count}
         scoringRuleKey={typedRoom.scoring_rule ?? 'standard'}
+        rules={allRules}
         roomId={typedRoom.id}
         isDone={isDone}
       />
@@ -93,6 +114,7 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
           roomId={typedRoom.id}
           roundNumber={nextRound}
           teamCount={typedRoom.team_count}
+          existingData={activeRound}
         />
       )}
     </div>

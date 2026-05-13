@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { RoundResult } from '@/types'
-import { ScoringRuleKey, SCORING_RULES, calcTeamScore } from '@/lib/scoring-rules'
+import { ScoringRule, ScoringRuleKey, SCORING_RULES, calcTeamScore } from '@/lib/scoring-rules'
 import { submitRoundResult, updateScoringRule, RoundResultInput } from '@/app/actions/room'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -32,18 +32,20 @@ export function ScoreBoard({
   rounds,
   teamCount,
   scoringRuleKey,
+  rules = SCORING_RULES,
   roomId,
   isDone = false,
 }: {
   rounds: RoundResult[]
   teamCount: 2 | 3
   scoringRuleKey: ScoringRuleKey
+  rules?: Record<ScoringRuleKey, ScoringRule>
   roomId: string
   isDone?: boolean
 }) {
   const router = useRouter()
   const [currentRuleKey, setCurrentRuleKey] = useState<ScoringRuleKey>(scoringRuleKey)
-  const rule = SCORING_RULES[currentRuleKey]
+  const rule = rules[currentRuleKey]
   const [editingRound, setEditingRound] = useState<RoundResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [ruleChanging, setRuleChanging] = useState(false)
@@ -80,7 +82,7 @@ export function ScoreBoard({
 
   const RuleSelector = () => isDone ? null : (
     <div className="flex flex-wrap gap-1.5 mt-2">
-      {(Object.values(SCORING_RULES) as typeof SCORING_RULES[ScoringRuleKey][]).map((r) => (
+      {(Object.values(rules) as ScoringRule[]).map((r) => (
         <span key={r.key} className="inline-flex items-center gap-1">
           <button
             disabled={ruleChanging}
@@ -118,15 +120,22 @@ export function ScoreBoard({
   const totals = [0, 0, 0]
 
   const roundRows = rounds.map((r) => {
+    const isComplete =
+      r.team1_placement != null &&
+      r.team2_placement != null &&
+      (teamCount !== 3 || r.team3_placement != null)
+
     const scores = [
-      calcTeamScore(rule, r.team1_placement, r.team1_kills),
-      calcTeamScore(rule, r.team2_placement, r.team2_kills),
+      r.team1_placement != null ? calcTeamScore(rule, r.team1_placement, r.team1_kills ?? 0) : null,
+      r.team2_placement != null ? calcTeamScore(rule, r.team2_placement, r.team2_kills ?? 0) : null,
       teamCount === 3 && r.team3_placement != null
         ? calcTeamScore(rule, r.team3_placement, r.team3_kills ?? 0)
         : null,
     ]
-    scores.forEach((s, i) => { if (s !== null) totals[i] += s })
-    return { round: r, scores }
+    if (isComplete) {
+      scores.forEach((s, i) => { if (s !== null) totals[i] += s })
+    }
+    return { round: r, scores, isComplete }
   })
 
   const winnerIdx = totals
@@ -160,9 +169,18 @@ export function ScoreBoard({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {roundRows.map(({ round, scores }) => (
+              {roundRows.map(({ round, scores, isComplete }) => (
                 <TableRow key={round.round_number}>
-                  <TableCell className="font-medium">{round.round_number}R</TableCell>
+                  <TableCell className="font-medium">
+                    <span className="flex items-center gap-1.5">
+                      {round.round_number}R
+                      {!isComplete && (
+                        <span className="text-[10px] text-yellow-400 border border-yellow-400/40 rounded px-1 py-0.5 leading-none">
+                          진행 중
+                        </span>
+                      )}
+                    </span>
+                  </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {round.map_name ?? '-'}
                   </TableCell>
@@ -173,14 +191,16 @@ export function ScoreBoard({
                   ))}
                   {!isDone && (
                     <TableCell className="text-right">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-xs text-muted-foreground h-6 px-2"
-                        onClick={() => setEditingRound(round)}
-                      >
-                        수정
-                      </Button>
+                      {isComplete && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-xs text-muted-foreground h-6 px-2"
+                          onClick={() => setEditingRound(round)}
+                        >
+                          수정
+                        </Button>
+                      )}
                     </TableCell>
                   )}
                   {isDone && <TableCell />}
@@ -214,9 +234,9 @@ export function ScoreBoard({
               initialData={{
                 mapName: editingRound.map_name ?? '에란겔',
                 teams: [
-                  { placement: String(editingRound.team1_placement), kills: String(editingRound.team1_kills) },
-                  { placement: String(editingRound.team2_placement), kills: String(editingRound.team2_kills) },
-                  { placement: String(editingRound.team3_placement ?? ''), kills: String(editingRound.team3_kills ?? '') },
+                  { placement: editingRound.team1_placement != null ? String(editingRound.team1_placement) : '', kills: editingRound.team1_kills != null ? String(editingRound.team1_kills) : '' },
+                  { placement: editingRound.team2_placement != null ? String(editingRound.team2_placement) : '', kills: editingRound.team2_kills != null ? String(editingRound.team2_kills) : '' },
+                  { placement: editingRound.team3_placement != null ? String(editingRound.team3_placement) : '', kills: editingRound.team3_kills != null ? String(editingRound.team3_kills) : '' },
                 ],
               }}
               submitLabel="수정 저장"

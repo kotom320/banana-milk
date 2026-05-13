@@ -48,12 +48,12 @@ export interface RoundResult {
   room_id: string
   round_number: number
   map_name: string
-  team1_placement: number
-  team1_kills: number
-  team2_placement: number
-  team2_kills: number
-  team3_placement?: number
-  team3_kills?: number
+  team1_placement: number | null
+  team1_kills: number | null
+  team2_placement: number | null
+  team2_kills: number | null
+  team3_placement?: number | null
+  team3_kills?: number | null
   created_at: string
 }
 

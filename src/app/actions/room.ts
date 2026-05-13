@@ -112,6 +112,51 @@ export async function updateScoringRule(roomId: string, scoringRule: ScoringRule
   revalidatePath(`/rooms/${roomId}`)
 }
 
+export async function submitTeamResult(
+  roomId: string,
+  roundNumber: number,
+  teamNumber: 1 | 2 | 3,
+  mapName: string,
+  placement: number,
+  kills: number
+) {
+  const supabase = await createClient()
+
+  const { data: existing } = await supabase
+    .from('round_results')
+    .select('id')
+    .eq('room_id', roomId)
+    .eq('round_number', roundNumber)
+    .maybeSingle()
+
+  if (existing) {
+    const updateData: Record<string, unknown> = { map_name: mapName }
+    updateData[`team${teamNumber}_placement`] = placement
+    updateData[`team${teamNumber}_kills`] = kills
+    const { error } = await supabase
+      .from('round_results')
+      .update(updateData)
+      .eq('id', existing.id)
+    if (error) throw new Error(error.message)
+  } else {
+    const insertData = {
+      room_id: roomId,
+      round_number: roundNumber,
+      map_name: mapName,
+      team1_placement: teamNumber === 1 ? placement : null,
+      team1_kills: teamNumber === 1 ? kills : null,
+      team2_placement: teamNumber === 2 ? placement : null,
+      team2_kills: teamNumber === 2 ? kills : null,
+      team3_placement: teamNumber === 3 ? placement : null,
+      team3_kills: teamNumber === 3 ? kills : null,
+    }
+    const { error } = await supabase.from('round_results').insert(insertData)
+    if (error) throw new Error(error.message)
+  }
+
+  revalidatePath(`/rooms/${roomId}`)
+}
+
 export async function finishRoom(roomId: string, winnerTeam: 1 | 2 | 3) {
   const supabase = await createClient()
   const { error } = await supabase

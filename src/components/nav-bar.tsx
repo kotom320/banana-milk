@@ -9,6 +9,7 @@ const links = [
   { href: '/players', label: '플레이어 관리' },
   { href: '/rooms', label: '내전 방' },
   { href: '/stats', label: '통계' },
+  { href: '/settings', label: '설정' },
 ]
 
 export function NavBar() {
