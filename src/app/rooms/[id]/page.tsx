@@ -5,7 +5,7 @@ import { SCORING_RULES, ScoringRuleKey, dbRowToScoringRule } from '@/lib/scoring
 import { calcTeamScore } from '@/lib/scoring-rules'
 import { TeamView } from './team-view'
 import { ScoreBoard } from './score-board'
-import { RoundInput } from './round-input'
+import { RoundManager } from './round-manager'
 import { FinishRoom } from './finish-room'
 import { WinnerBanner } from './winner-banner'
 
@@ -58,7 +58,6 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
   }
 
   const completeRounds = typedRoom.round_results.filter(isRoundComplete)
-  const activeRound = typedRoom.round_results.find((r) => !isRoundComplete(r))
 
   const totals = [0, 0, 0]
   for (const r of completeRounds) {
@@ -69,7 +68,6 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
     }
   }
 
-  const nextRound = activeRound?.round_number ?? (completeRounds.length + 1)
   const isDone = typedRoom.status === 'done'
 
   return (
@@ -109,12 +107,11 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
         isDone={isDone}
       />
 
-      {!isDone && nextRound <= 10 && (
-        <RoundInput
+      {!isDone && (
+        <RoundManager
           roomId={typedRoom.id}
-          roundNumber={nextRound}
           teamCount={typedRoom.team_count}
-          existingData={activeRound}
+          allRounds={typedRoom.round_results}
         />
       )}
     </div>
