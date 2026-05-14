@@ -27,7 +27,10 @@ export function RealtimeSync({ roomId }: { roomId: string }) {
         { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `id=eq.${roomId}` },
         () => router.refresh()
       )
-      .subscribe()
+      .subscribe((status, err) => {
+        if (err) console.error('[Realtime] error:', err)
+        else console.log('[Realtime] status:', status)
+      })
 
     return () => {
       supabase.removeChannel(channel)
