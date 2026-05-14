@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160" fill="none">
+  <!-- bottle body -->
+  <path d="M30 55 Q20 65 18 90 Q16 120 20 138 Q24 152 60 152 Q96 152 100 138 Q104 120 102 90 Q100 65 90 55 Z" fill="#F5E642" stroke="#D4C200" stroke-width="2"/>
+  <!-- bottle neck -->
+  <rect x="42" y="38" width="36" height="20" rx="4" fill="#F5E642" stroke="#D4C200" stroke-width="2"/>
+  <!-- cap -->
+  <rect x="44" y="28" width="32" height="14" rx="6" fill="#E8C840" stroke="#D4C200" stroke-width="2"/>
+  <!-- straw -->
+  <rect x="56" y="6" width="8" height="26" rx="4" fill="#fff" stroke="#ccc" stroke-width="1.5"/>
+  <!-- label bg -->
+  <ellipse cx="60" cy="105" rx="30" ry="28" fill="#fffbe6" opacity="0.85"/>
+  <!-- banana icon on label -->
+  <text x="60" y="100" font-size="22" text-anchor="middle" dominant-baseline="middle">🍌</text>
+  <!-- label text -->
+  <text x="60" y="122" font-size="9" font-weight="bold" text-anchor="middle" fill="#8B6914" font-family="sans-serif">바나나우유</text>
+  <!-- shine -->
+  <ellipse cx="38" cy="80" rx="6" ry="12" fill="white" opacity="0.25" transform="rotate(-20 38 80)"/>
+</svg>

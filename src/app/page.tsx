@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { buttonVariants } from '@/components/ui/button'
@@ -7,10 +8,12 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center gap-12 py-16">
       <div className="text-center space-y-4">
-        <div className="text-6xl">🍌</div>
+        <div className="flex justify-center">
+          <Image src="/banana-milk.svg" alt="banana-milk" width={96} height={128} priority />
+        </div>
         <h1 className="text-4xl font-bold text-yellow-400">banana-milk</h1>
         <p className="text-muted-foreground text-lg">
-          PUBG 내전 팀 밸런서 — 진 팀이 이긴 팀에게 바나나우유를 쏜다
+          진 팀이 쏜다 🥛
         </p>
       </div>
 
@@ -66,9 +69,6 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="text-xs text-muted-foreground border border-border rounded-lg px-4 py-3 max-w-md text-center">
-        <strong>내전 점수룰</strong>: 1위 10점 · 2위 6점 · 3위 5점 · 4위 4점 · 5위 3점 · 6~10위 2점 · 11위~ 1점 + 킬당 1점
-      </div>
     </div>
   )
 }
