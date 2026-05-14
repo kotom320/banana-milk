@@ -154,6 +154,13 @@ export async function submitTeamResult(
     if (error) throw new Error(error.message)
   }
 
+  // 첫 결과 저장 시 방 상태를 진행 중으로 전환
+  await supabase
+    .from('rooms')
+    .update({ status: 'in_progress' })
+    .eq('id', roomId)
+    .eq('status', 'waiting')
+
   revalidatePath(`/rooms/${roomId}`)
 }
 
