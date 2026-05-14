@@ -1,18 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160" fill="none">
-  <!-- bottle body -->
-  <path d="M30 55 Q20 65 18 90 Q16 120 20 138 Q24 152 60 152 Q96 152 100 138 Q104 120 102 90 Q100 65 90 55 Z" fill="#F5E642" stroke="#D4C200" stroke-width="2"/>
-  <!-- bottle neck -->
-  <rect x="42" y="38" width="36" height="20" rx="4" fill="#F5E642" stroke="#D4C200" stroke-width="2"/>
-  <!-- cap -->
-  <rect x="44" y="28" width="32" height="14" rx="6" fill="#E8C840" stroke="#D4C200" stroke-width="2"/>
-  <!-- straw -->
-  <rect x="56" y="6" width="8" height="26" rx="4" fill="#fff" stroke="#ccc" stroke-width="1.5"/>
-  <!-- label bg -->
-  <ellipse cx="60" cy="105" rx="30" ry="28" fill="#fffbe6" opacity="0.85"/>
-  <!-- banana icon on label -->
-  <text x="60" y="100" font-size="22" text-anchor="middle" dominant-baseline="middle">🍌</text>
-  <!-- label text -->
-  <text x="60" y="122" font-size="9" font-weight="bold" text-anchor="middle" fill="#8B6914" font-family="sans-serif">바나나우유</text>
-  <!-- shine -->
-  <ellipse cx="38" cy="80" rx="6" ry="12" fill="white" opacity="0.25" transform="rotate(-20 38 80)"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 170">
+  <!-- bottle shadow/outline base -->
+
+  <!-- lower cylinder body -->
+  <path d="M33 103 Q30 103 29 106 L27 148 Q27 162 60 162 Q93 162 93 148 L91 106 Q90 103 87 103 Z"
+    fill="#F5F0C8" stroke="#D8D098" stroke-width="1.5"/>
+
+  <!-- upper funnel body -->
+  <path d="M8 52 L112 52 Q110 58 104 72 Q98 86 90 98 Q88 103 87 103 L33 103 Q32 103 30 98 Q22 86 16 72 Q10 58 8 52 Z"
+    fill="#F5F0C8" stroke="#D8D098" stroke-width="1.5"/>
+
+  <!-- fill gap at waist -->
+  <rect x="30" y="100" width="60" height="6" fill="#F5F0C8"/>
+
+  <!-- green cap wrap -->
+  <path d="M8 50 Q8 42 60 42 Q112 42 112 50 L112 54 Q112 62 60 62 Q8 62 8 54 Z"
+    fill="#3D7A3D"/>
+  <ellipse cx="60" cy="50" rx="52" ry="10" fill="#4A8F4A"/>
+
+  <!-- green cap top disc -->
+  <ellipse cx="60" cy="38" rx="40" ry="9" fill="#2D6A2D"/>
+  <rect x="20" y="30" width="80" height="10" rx="3" fill="#2D6A2D"/>
+  <ellipse cx="60" cy="30" rx="40" ry="9" fill="#3D7A3D"/>
+
+  <!-- cap very top (dark rim) -->
+  <ellipse cx="60" cy="24" rx="30" ry="7" fill="#1A4A1A"/>
+  <rect x="30" y="18" width="60" height="8" rx="3" fill="#1A4A1A"/>
+  <ellipse cx="60" cy="18" rx="30" ry="6" fill="#266226"/>
+
+  <!-- label on lower body -->
+  <text x="60" y="126" font-size="10.5" font-weight="bold" text-anchor="middle"
+    fill="#2D6A2D" font-family="'Malgun Gothic','Apple SD Gothic Neo',sans-serif">바나나맛우유</text>
+
+  <!-- label on upper body -->
+  <text x="60" y="80" font-size="7.5" font-weight="bold" text-anchor="middle"
+    fill="#3D7A3D" font-family="'Malgun Gothic','Apple SD Gothic Neo',sans-serif">빙그레</text>
+  <text x="60" y="92" font-size="10" font-weight="bold" text-anchor="middle"
+    fill="#2D6A2D" font-family="'Malgun Gothic','Apple SD Gothic Neo',sans-serif">바나나맛우유</text>
+
+  <!-- shine left upper -->
+  <path d="M20 60 Q17 73 19 88" stroke="white" stroke-width="5" stroke-linecap="round" opacity="0.25"/>
+  <!-- shine left lower -->
+  <path d="M36 108 Q34 125 36 148" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.2"/>
 </svg>

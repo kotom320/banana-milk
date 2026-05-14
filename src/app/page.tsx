@@ -9,7 +9,7 @@ export default function Home() {
     <div className="flex flex-col items-center gap-12 py-16">
       <div className="text-center space-y-4">
         <div className="flex justify-center">
-          <Image src="/banana-milk.svg" alt="banana-milk" width={96} height={128} priority />
+          <Image src="/banana-milk.svg" alt="banana-milk" width={90} height={128} priority />
         </div>
         <h1 className="text-4xl font-bold text-yellow-400">banana-milk</h1>
         <p className="text-muted-foreground text-lg">
