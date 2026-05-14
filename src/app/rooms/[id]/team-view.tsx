@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { GripVertical } from 'lucide-react'
@@ -41,6 +41,11 @@ export function TeamView({
   const router = useRouter()
   const [teams, setTeams] = useState(initialTeams)
   const [pending, setPending] = useState(false)
+
+  // 다른 클라이언트의 변경이 router.refresh()로 들어오면 state 동기화
+  useEffect(() => {
+    if (!pending) setTeams(initialTeams)
+  }, [initialTeams]) // eslint-disable-line react-hooks/exhaustive-deps
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const [dragOverTeam, setDragOverTeam] = useState<number | null>(null)
 
