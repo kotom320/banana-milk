@@ -5,7 +5,7 @@ import { SCORING_RULES, ScoringRuleKey, dbRowToScoringRule } from '@/lib/scoring
 import { calcTeamScore } from '@/lib/scoring-rules'
 import { TeamView } from './team-view'
 import { ScoreBoard } from './score-board'
-import { RoundManager } from './round-manager'
+import { ScoreManager } from './score-manager'
 import { FinishRoom } from './finish-room'
 import { WinnerBanner } from './winner-banner'
 
@@ -98,7 +98,7 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
 
       <TeamView teams={teams} teamCount={typedRoom.team_count} roomId={typedRoom.id} isDone={isDone} />
 
-      <ScoreBoard
+      <ScoreManager
         rounds={typedRoom.round_results}
         teamCount={typedRoom.team_count}
         scoringRuleKey={typedRoom.scoring_rule ?? 'standard'}
@@ -106,14 +106,6 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
         roomId={typedRoom.id}
         isDone={isDone}
       />
-
-      {!isDone && (
-        <RoundManager
-          roomId={typedRoom.id}
-          teamCount={typedRoom.team_count}
-          allRounds={typedRoom.round_results}
-        />
-      )}
     </div>
   )
 }

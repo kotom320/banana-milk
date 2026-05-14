@@ -34,11 +34,13 @@ export function RoundInput({
   roundNumber,
   teamCount,
   existingData,
+  noCard = false,
 }: {
   roomId: string
   roundNumber: number
   teamCount: 2 | 3
   existingData?: RoundResult
+  noCard?: boolean
 }) {
   const router = useRouter()
   const [mapName, setMapName] = useState(existingData?.map_name ?? '에란겔')
@@ -77,96 +79,102 @@ export function RoundInput({
     }
   }
 
+  const body = (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label className="text-xs text-muted-foreground">맵</Label>
+        <div className="flex flex-wrap gap-1.5">
+          {PUBG_MAPS.map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => setMapName(m)}
+              className={cn(
+                'px-2.5 py-1 rounded-md text-xs border transition-colors',
+                mapName === m
+                  ? 'border-yellow-400 bg-yellow-400/10 text-yellow-400'
+                  : 'border-border text-muted-foreground hover:border-foreground/40'
+              )}
+            >
+              {m}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        {Array.from({ length: teamCount }, (_, i) => {
+          const t = teams[i]
+          const isValid = t.placement !== '' && t.kills !== ''
+
+          return (
+            <div key={i} className="border border-border rounded-lg p-3 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className={`text-sm font-medium ${TEAM_COLORS[i]}`}>{TEAM_LABELS[i]}</span>
+                {!t.editing && (
+                  <span className="text-xs text-green-500">
+                    {t.placement}위 · {t.kills}킬 ✓
+                  </span>
+                )}
+              </div>
+
+              {t.editing ? (
+                <div className="flex items-end gap-2">
+                  <div className="space-y-1 flex-1">
+                    <Label className="text-xs text-muted-foreground">순위</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={64}
+                      placeholder="예: 3"
+                      value={t.placement}
+                      onChange={(e) => setTeam(i, { placement: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-1 flex-1">
+                    <Label className="text-xs text-muted-foreground">킬 수</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      placeholder="예: 5"
+                      value={t.kills}
+                      onChange={(e) => setTeam(i, { kills: e.target.value })}
+                    />
+                  </div>
+                  <Button
+                    size="sm"
+                    disabled={!isValid || t.saving}
+                    onClick={() => handleSave(i)}
+                    className="bg-yellow-400 text-black hover:bg-yellow-300 shrink-0"
+                  >
+                    {t.saving ? '...' : '저장'}
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-xs text-muted-foreground h-6 px-2"
+                  onClick={() => setTeam(i, { editing: true })}
+                >
+                  수정
+                </Button>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+
+  if (noCard) return body
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-base">{roundNumber}라운드 진행 중</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label className="text-xs text-muted-foreground">맵</Label>
-          <div className="flex flex-wrap gap-1.5">
-            {PUBG_MAPS.map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setMapName(m)}
-                className={cn(
-                  'px-2.5 py-1 rounded-md text-xs border transition-colors',
-                  mapName === m
-                    ? 'border-yellow-400 bg-yellow-400/10 text-yellow-400'
-                    : 'border-border text-muted-foreground hover:border-foreground/40'
-                )}
-              >
-                {m}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          {Array.from({ length: teamCount }, (_, i) => {
-            const t = teams[i]
-            const isValid = t.placement !== '' && t.kills !== ''
-
-            return (
-              <div key={i} className="border border-border rounded-lg p-3 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className={`text-sm font-medium ${TEAM_COLORS[i]}`}>{TEAM_LABELS[i]}</span>
-                  {!t.editing && (
-                    <span className="text-xs text-green-500">
-                      {t.placement}위 · {t.kills}킬 ✓
-                    </span>
-                  )}
-                </div>
-
-                {t.editing ? (
-                  <div className="flex items-end gap-2">
-                    <div className="space-y-1 flex-1">
-                      <Label className="text-xs text-muted-foreground">순위</Label>
-                      <Input
-                        type="number"
-                        min={1}
-                        max={64}
-                        placeholder="예: 3"
-                        value={t.placement}
-                        onChange={(e) => setTeam(i, { placement: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-1 flex-1">
-                      <Label className="text-xs text-muted-foreground">킬 수</Label>
-                      <Input
-                        type="number"
-                        min={0}
-                        placeholder="예: 5"
-                        value={t.kills}
-                        onChange={(e) => setTeam(i, { kills: e.target.value })}
-                      />
-                    </div>
-                    <Button
-                      size="sm"
-                      disabled={!isValid || t.saving}
-                      onClick={() => handleSave(i)}
-                      className="bg-yellow-400 text-black hover:bg-yellow-300 shrink-0"
-                    >
-                      {t.saving ? '...' : '저장'}
-                    </Button>
-                  </div>
-                ) : (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="text-xs text-muted-foreground h-6 px-2"
-                    onClick={() => setTeam(i, { editing: true })}
-                  >
-                    수정
-                  </Button>
-                )}
-              </div>
-            )
-          })}
-        </div>
-      </CardContent>
+      <CardContent>{body}</CardContent>
     </Card>
   )
 }
