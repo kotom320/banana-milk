@@ -124,7 +124,7 @@ export function TeamView({
                     setDraggingId(null)
                     setDragOverTeam(null)
                   }}
-                  className={`flex items-center gap-2 text-sm rounded-md transition-opacity ${
+                  className={`flex items-center gap-2 text-sm rounded-md transition-opacity select-none ${
                     !isDone ? 'cursor-grab active:cursor-grabbing' : ''
                   } ${draggingId === rp.id ? 'opacity-40' : ''}`}
                 >
