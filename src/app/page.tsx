@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { buttonVariants } from '@/components/ui/button'
@@ -8,9 +7,8 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center gap-12 py-16">
       <div className="text-center space-y-4">
-        <div className="flex justify-center">
-          <Image src="/banana-milk.png" alt="바나나맛우유" width={140} height={160} priority />
-        </div>
+        <div className="text-6xl">🍌</div>
+        <h1 className="text-4xl font-bold text-yellow-400">banana-milk</h1>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-2xl">
