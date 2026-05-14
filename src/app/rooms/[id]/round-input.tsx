@@ -12,7 +12,7 @@ import { PUBG_MAPS } from '@/lib/pubg-maps'
 import { submitTeamResult } from '@/app/actions/room'
 import { RoundResult } from '@/types'
 
-const TEAM_LABELS = ['Team A', 'Team B', 'Team C']
+const TEAM_LABELS = ['Team 1', 'Team 2', 'Team 3']
 const TEAM_COLORS = ['text-red-400', 'text-blue-400', 'text-green-400']
 
 interface TeamState {

@@ -149,7 +149,7 @@ export default async function StatsPage() {
                 </span>
                 <span className="flex-1 truncate">{room.title}</span>
                 <span className="text-yellow-400 font-medium shrink-0">
-                  🏆 {['Team A', 'Team B', 'Team C'][room.winner_team - 1]}
+                  🏆 {['Team 1', 'Team 2', 'Team 3'][room.winner_team - 1]}
                 </span>
               </div>
             )

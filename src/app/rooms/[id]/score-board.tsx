@@ -26,7 +26,7 @@ import {
 import { RoundForm } from './round-form'
 import { InfoTooltip } from '@/components/info-tooltip'
 
-const TEAM_LABELS = ['Team A', 'Team B', 'Team C']
+const TEAM_LABELS = ['Team 1', 'Team 2', 'Team 3']
 
 export function ScoreBoard({
   rounds,

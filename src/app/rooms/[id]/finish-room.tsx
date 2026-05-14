@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog'
 import { finishRoom } from '@/app/actions/room'
 
-const TEAM_LABELS = ['Team A', 'Team B', 'Team C']
+const TEAM_LABELS = ['Team 1', 'Team 2', 'Team 3']
 const TEAM_COLORS = ['text-red-400', 'text-blue-400', 'text-green-400']
 const TEAM_BORDER = ['border-red-500', 'border-blue-500', 'border-green-500']
 

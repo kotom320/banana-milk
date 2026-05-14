@@ -29,7 +29,7 @@ import { ScoringRule, ScoringRuleKey, SCORING_RULES, calcTeamScore } from '@/lib
 import { submitRoundResult, submitTeamResult, updateScoringRule, RoundResultInput } from '@/app/actions/room'
 import { PUBG_MAPS } from '@/lib/pubg-maps'
 
-const TEAM_LABELS = ['Team A', 'Team B', 'Team C']
+const TEAM_LABELS = ['Team 1', 'Team 2', 'Team 3']
 const TEAM_COLORS = ['text-red-400', 'text-blue-400', 'text-green-400']
 const MAX_ROUNDS = 10
 

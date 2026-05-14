@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import { PUBG_MAPS } from '@/lib/pubg-maps'
 import { RoundResultInput } from '@/app/actions/room'
 
-const TEAM_LABELS = ['Team A', 'Team B', 'Team C']
+const TEAM_LABELS = ['Team 1', 'Team 2', 'Team 3']
 const TEAM_COLORS = ['text-red-400', 'text-blue-400', 'text-green-400']
 
 interface TeamInput {
