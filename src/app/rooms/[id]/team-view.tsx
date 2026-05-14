@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { GripVertical } from 'lucide-react'
@@ -40,13 +40,14 @@ export function TeamView({
 }) {
   const router = useRouter()
   const [teams, setTeams] = useState(initialTeams)
-  const [pending, startTransition] = useTransition()
+  const [pending, setPending] = useState(false)
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const [dragOverTeam, setDragOverTeam] = useState<number | null>(null)
 
-  function handleMove(rp: RoomPlayerWithPlayer, newTeam: 1 | 2 | 3) {
-    if (newTeam === rp.team_number) return
+  async function handleMove(rp: RoomPlayerWithPlayer, newTeam: 1 | 2 | 3) {
+    if (newTeam === rp.team_number || pending) return
 
+    setPending(true)
     setTeams((prev) => {
       const next: Record<number, RoomPlayerWithPlayer[]> = {}
       for (let i = 1; i <= 3; i++) {
@@ -56,16 +57,16 @@ export function TeamView({
       return next
     })
 
-    startTransition(async () => {
-      try {
-        await movePlayerTeam(rp.id, newTeam, roomId)
-        router.refresh()
-        notifyRoomMutation(roomId)
-      } catch {
-        toast.error('팀 이동 실패')
-        setTeams(initialTeams)
-      }
-    })
+    try {
+      await movePlayerTeam(rp.id, newTeam, roomId)
+      router.refresh()
+      notifyRoomMutation(roomId)
+    } catch {
+      toast.error('팀 이동 실패')
+      setTeams(initialTeams)
+    } finally {
+      setPending(false)
+    }
   }
 
   function findRp(id: string) {
