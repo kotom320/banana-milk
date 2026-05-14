@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const links = [
@@ -9,7 +10,6 @@ const links = [
   { href: '/players', label: '플레이어 관리' },
   { href: '/rooms', label: '내전 방' },
   { href: '/stats', label: '통계' },
-  { href: '/settings', label: '설정' },
 ]
 
 export function NavBar() {
@@ -17,11 +17,11 @@ export function NavBar() {
 
   return (
     <nav className="border-b border-border bg-background/80 backdrop-blur sticky top-0 z-50">
-      <div className="container mx-auto px-4 max-w-5xl flex items-center gap-6 h-14">
-        <Link href="/" className="font-bold text-lg text-yellow-400">
+      <div className="container mx-auto px-4 max-w-5xl flex items-center h-14">
+        <Link href="/" className="font-bold text-lg text-yellow-400 mr-6">
           🍌 banana-milk
         </Link>
-        <div className="flex gap-4">
+        <div className="flex gap-4 flex-1">
           {links.map((link) => (
             <Link
               key={link.href}
@@ -37,6 +37,17 @@ export function NavBar() {
             </Link>
           ))}
         </div>
+        <Link
+          href="/settings"
+          className={cn(
+            'p-1.5 rounded-md transition-colors',
+            pathname === '/settings'
+              ? 'text-foreground'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          <Settings className="w-4 h-4" />
+        </Link>
       </div>
     </nav>
   )

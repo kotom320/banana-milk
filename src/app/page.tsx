@@ -43,19 +43,27 @@ export default function Home() {
         </Card>
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex flex-col items-center gap-3">
         <Link
-          href="/players"
-          className={cn(buttonVariants({ size: 'lg' }), 'bg-yellow-400 text-black hover:bg-yellow-300')}
+          href="/rooms/new"
+          className={cn(buttonVariants({ size: 'lg' }), 'bg-yellow-400 text-black hover:bg-yellow-300 w-48')}
         >
-          플레이어 관리
+          + 내전 만들기
         </Link>
-        <Link
-          href="/rooms"
-          className={cn(buttonVariants({ size: 'lg', variant: 'outline' }))}
-        >
-          내전 방 목록
-        </Link>
+        <div className="flex gap-3">
+          <Link
+            href="/rooms"
+            className={cn(buttonVariants({ size: 'sm', variant: 'outline' }))}
+          >
+            내전 방 목록
+          </Link>
+          <Link
+            href="/players"
+            className={cn(buttonVariants({ size: 'sm', variant: 'outline' }))}
+          >
+            플레이어 관리
+          </Link>
+        </div>
       </div>
 
       <div className="text-xs text-muted-foreground border border-border rounded-lg px-4 py-3 max-w-md text-center">
