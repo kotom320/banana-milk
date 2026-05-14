@@ -8,6 +8,7 @@ import { ScoreBoard } from './score-board'
 import { ScoreManager } from './score-manager'
 import { FinishRoom } from './finish-room'
 import { WinnerBanner } from './winner-banner'
+import { RealtimeSync } from './realtime-sync'
 
 export const dynamic = 'force-dynamic'
 
@@ -72,6 +73,7 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
 
   return (
     <div className="space-y-8">
+      <RealtimeSync roomId={typedRoom.id} />
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">{typedRoom.title}</h1>
