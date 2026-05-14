@@ -33,27 +33,29 @@ export function RuleEditForm({ rule, isCustomized }: Props) {
 
   async function handleSave() {
     setSaving(true)
-    try {
-      await updateScoringRuleConfig(
-        rule.key,
-        name.trim() || rule.name,
-        `${placements[0]}점 · 킬당 ${killPoint}점`,
-        placements.map((v) => Number(v) || 0),
-        Number(killPoint) || 0
-      )
+    const result = await updateScoringRuleConfig(
+      rule.key,
+      name.trim() || rule.name,
+      `${placements[0]}점 · 킬당 ${killPoint}점`,
+      placements.map((v) => Number(v) || 0),
+      Number(killPoint) || 0
+    )
+    setSaving(false)
+    if (result.error) {
+      toast.error(result.error)
+    } else {
       toast.success(`${name} 저장 완료`)
       router.refresh()
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : '저장 실패')
-    } finally {
-      setSaving(false)
     }
   }
 
   async function handleReset() {
     setResetting(true)
-    try {
-      await resetScoringRuleConfig(rule.key as ScoringRuleKey)
+    const result = await resetScoringRuleConfig(rule.key as ScoringRuleKey)
+    setResetting(false)
+    if (result.error) {
+      toast.error(result.error)
+    } else {
       const defaults = SCORING_RULES[rule.key as ScoringRuleKey]
       setName(defaults.name)
       setKillPoint(String(defaults.killPoint))
@@ -62,10 +64,6 @@ export function RuleEditForm({ rule, isCustomized }: Props) {
       )
       toast.success('기본값으로 초기화')
       router.refresh()
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : '초기화 실패')
-    } finally {
-      setResetting(false)
     }
   }
 

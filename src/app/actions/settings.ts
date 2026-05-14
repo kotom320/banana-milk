@@ -4,13 +4,15 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { ScoringRuleKey } from '@/lib/scoring-rules'
 
+type ActionResult = { error: string } | { error: null }
+
 export async function updateScoringRuleConfig(
   key: ScoringRuleKey,
   name: string,
   description: string,
   placements: number[],
   killPoint: number
-) {
+): Promise<ActionResult> {
   const supabase = await createClient()
   const { error } = await supabase
     .from('scoring_rule_configs')
@@ -23,19 +25,21 @@ export async function updateScoringRuleConfig(
       updated_at: new Date().toISOString(),
     }, { onConflict: 'key' })
 
-  if (error) throw new Error(error.message)
+  if (error) return { error: error.message }
   revalidatePath('/settings')
-  revalidatePath('/rooms', 'layout')
+  revalidatePath('/rooms/[id]', 'page')
+  return { error: null }
 }
 
-export async function resetScoringRuleConfig(key: ScoringRuleKey) {
+export async function resetScoringRuleConfig(key: ScoringRuleKey): Promise<ActionResult> {
   const supabase = await createClient()
   const { error } = await supabase
     .from('scoring_rule_configs')
     .delete()
     .eq('key', key)
 
-  if (error) throw new Error(error.message)
+  if (error) return { error: error.message }
   revalidatePath('/settings')
-  revalidatePath('/rooms', 'layout')
+  revalidatePath('/rooms/[id]', 'page')
+  return { error: null }
 }
