@@ -9,9 +9,8 @@ export default function Home() {
     <div className="flex flex-col items-center gap-12 py-16">
       <div className="text-center space-y-4">
         <div className="flex justify-center">
-          <Image src="/banana-milk.webp" alt="banana-milk" width={110} height={128} priority />
+          <Image src="/banana-milk.png" alt="바나나맛우유" width={140} height={160} priority />
         </div>
-        <h1 className="text-4xl font-bold text-yellow-400">banana-milk</h1>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-2xl">
