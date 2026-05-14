@@ -4,26 +4,32 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
+export const ROOM_MUTATED_EVENT = (roomId: string) => `room-mutated:${roomId}`
+
+/** 변경을 일으킨 탭에서 호출 — RealtimeSync가 이를 받아 다른 클라이언트에 broadcast */
+export function notifyRoomMutation(roomId: string) {
+  window.dispatchEvent(new Event(ROOM_MUTATED_EVENT(roomId)))
+}
+
 export function RealtimeSync({ roomId }: { roomId: string }) {
   const router = useRouter()
 
   useEffect(() => {
     const supabase = createClient()
 
-    function onRoomChange(payload: Record<string, unknown>) {
-      const row = (payload.new ?? payload.old) as Record<string, unknown> | null
-      const id = row?.room_id ?? row?.id
-      if (!id || id === roomId) router.refresh()
-    }
-
     const channel = supabase
       .channel(`room:${roomId}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'room_players' }, onRoomChange)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'round_results' }, onRoomChange)
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rooms' }, onRoomChange)
+      .on('broadcast', { event: 'refresh' }, () => router.refresh())
       .subscribe()
 
+    function onLocalMutation() {
+      channel.send({ type: 'broadcast', event: 'refresh', payload: {} })
+    }
+
+    window.addEventListener(ROOM_MUTATED_EVENT(roomId), onLocalMutation)
+
     return () => {
+      window.removeEventListener(ROOM_MUTATED_EVENT(roomId), onLocalMutation)
       supabase.removeChannel(channel)
     }
   }, [roomId, router])

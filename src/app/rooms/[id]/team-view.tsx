@@ -8,6 +8,7 @@ import { Player, RoomPlayer, Tier } from '@/types'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { movePlayerTeam } from '@/app/actions/room'
+import { notifyRoomMutation } from './realtime-sync'
 
 const TIER_COLORS: Record<Tier, string> = {
   1: 'bg-yellow-400 text-black',
@@ -59,6 +60,7 @@ export function TeamView({
       try {
         await movePlayerTeam(rp.id, newTeam, roomId)
         router.refresh()
+        notifyRoomMutation(roomId)
       } catch {
         toast.error('팀 이동 실패')
         setTeams(initialTeams)

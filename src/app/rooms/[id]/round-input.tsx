@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
 import { PUBG_MAPS } from '@/lib/pubg-maps'
 import { submitTeamResult } from '@/app/actions/room'
+import { notifyRoomMutation } from './realtime-sync'
 import { RoundResult } from '@/types'
 
 const TEAM_LABELS = ['Team 1', 'Team 2', 'Team 3']
@@ -73,6 +74,7 @@ export function RoundInput({
       toast.success(`${TEAM_LABELS[idx]} ${roundNumber}라운드 저장`)
       setTeam(idx, { editing: false, saving: false })
       router.refresh()
+      notifyRoomMutation(roomId)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : '저장 실패')
       setTeam(idx, { saving: false })

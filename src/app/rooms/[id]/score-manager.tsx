@@ -27,6 +27,7 @@ import { RoundForm } from './round-form'
 import { RoundResult } from '@/types'
 import { ScoringRule, ScoringRuleKey, SCORING_RULES, calcTeamScore } from '@/lib/scoring-rules'
 import { submitRoundResult, submitTeamResult, updateScoringRule, RoundResultInput } from '@/app/actions/room'
+import { notifyRoomMutation } from './realtime-sync'
 import { PUBG_MAPS } from '@/lib/pubg-maps'
 
 const TEAM_LABELS = ['Team 1', 'Team 2', 'Team 3']
@@ -96,6 +97,7 @@ function EditableRoundRow({
       toast.success(`${TEAM_LABELS[idx]} ${roundNumber}R 저장`)
       setTeam(idx, { editing: false, saving: false })
       router.refresh()
+      notifyRoomMutation(roomId)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : '저장 실패')
       setTeam(idx, { saving: false })
@@ -241,6 +243,7 @@ export function ScoreManager({
     try {
       await updateScoringRule(roomId, key)
       router.refresh()
+      notifyRoomMutation(roomId)
     } catch {
       toast.error('룰 변경 실패')
       setCurrentRuleKey(currentRuleKey)
@@ -257,6 +260,7 @@ export function ScoreManager({
       toast.success(`${editingRound.round_number}라운드 수정 완료`)
       setEditingRound(null)
       router.refresh()
+      notifyRoomMutation(roomId)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : '수정 실패')
     } finally {
