@@ -318,6 +318,11 @@ export function ScoreManager({
                 if (isDone || (round && complete)) {
                   // 완료된 행
                   const scores = scoreMap.get(n) ?? []
+                  const teamData = round ? [
+                    { placement: round.team1_placement, kills: round.team1_kills },
+                    { placement: round.team2_placement, kills: round.team2_kills },
+                    { placement: round.team3_placement ?? null, kills: round.team3_kills ?? null },
+                  ] : []
                   return (
                     <TableRow key={n}>
                       <TableCell className="font-medium">{n}R</TableCell>
@@ -326,7 +331,14 @@ export function ScoreManager({
                       </TableCell>
                       {scores.slice(0, teamCount).map((s, i) => (
                         <TableCell key={i} className="text-right">
-                          {s ?? '-'}
+                          <div className="flex flex-col items-end gap-0.5">
+                            <span>{s ?? '-'}</span>
+                            {teamData[i]?.placement != null && (
+                              <span className="text-[10px] text-muted-foreground">
+                                {teamData[i].placement}위·{teamData[i].kills ?? 0}킬
+                              </span>
+                            )}
+                          </div>
                         </TableCell>
                       ))}
                       <TableCell className="text-right">

@@ -6,6 +6,7 @@ export const PUBG_MAPS = [
   '태이고',
   '데스턴',
   '론도',
+  '카리킨',
 ] as const
 
 export type PubgMap = (typeof PUBG_MAPS)[number]
